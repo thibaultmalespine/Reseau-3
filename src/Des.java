@@ -45,9 +45,33 @@ public class Des {
         ArrayList<int[]> tab_cles = new ArrayList<>();
     }
 
+    public int[] crypte(String message_clair){
+
+        // blocs de 64 bits, soit 8 caractères
+        ArrayList<String> message_découpé = new ArrayList<>();
+            // Todo : bourrer le message clair pour qu'il soit découpable en tronçon de 64 bits (mod64 = 0)
+        for (int i = 0; i < message_clair.length(); i+=8) {        
+            message_découpé.add(message_clair.substring(i, i+8));
+        }
+        System.out.println(message_découpé);
+
+/* 
+        byte[] bytes = message_clair.getBytes();
+        System.out.println(Arrays.toString(bytes));
+        for (byte b : bytes) {
+            System.out.println('0'+Integer.toBinaryString(b));
+        } 
+*/
+
+
+
+        int[] cryptage = new int[64];
+        return cryptage; 
+    }
     
     public static void main(String[] args) {
         Des des = new Des();
+        des.crypte("coucou");
     
     }
 

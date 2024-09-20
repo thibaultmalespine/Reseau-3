@@ -36,6 +36,9 @@ public class Des {
     };
     int[] masterKey;
 
+    /**
+     * initialise la masterKey et créé tab_cles
+     */
     public Des(){
         masterKey = new int[64];
         for (int i = 0; i < 64; i++) {
@@ -45,34 +48,67 @@ public class Des {
         ArrayList<int[]> tab_cles = new ArrayList<>();
     }
 
-    public int[] crypte(String message_clair){
-
-        // blocs de 64 bits, soit 8 caractères
-        ArrayList<String> message_découpé = new ArrayList<>();
-            // Todo : bourrer le message clair pour qu'il soit découpable en tronçon de 64 bits (mod64 = 0)
-        for (int i = 0; i < message_clair.length(); i+=8) {        
-            message_découpé.add(message_clair.substring(i, i+8));
-        }
-        System.out.println(message_découpé);
-
-/* 
-        byte[] bytes = message_clair.getBytes();
-        System.out.println(Arrays.toString(bytes));
-        for (byte b : bytes) {
-            System.out.println('0'+Integer.toBinaryString(b));
-        } 
-*/
-
-
-
-        int[] cryptage = new int[64];
-        return cryptage; 
-    }
+    public ArrayList<Integer>  crypte(String message_clair){
+        message_clair.replaceAll(" ", "_");
+        
+        ArrayList<Integer> message_en_binaire = stringToBits(message_clair);
+        
+        return message_en_binaire;
     
+    }
+
+    /**
+     * Transforme une chaine de caractère en tableau d'entier (chaque entier correspond à un charactère codé sur 7 bits)
+     * @param message
+     * @return
+     */
+    private ArrayList<Integer> stringToBits(String message){
+        ArrayList<Integer> bits = new ArrayList<>();
+        for (char c : message.toCharArray()) {
+            bits.add(Integer.valueOf((Integer.toBinaryString((int)c))));  
+
+        }
+        return bits;
+    }
+
+
+
+    public ArrayList<ArrayList<Integer>>  decoupage(ArrayList<Integer> bloc, int taille_bloc){
+        ArrayList<ArrayList<Integer>> blocDecoupé = new ArrayList<>();
+
+        while(bloc.size() % (taille_bloc/8) != 0) {
+            bloc.add(00000000);
+        }
+
+
+        for (int i = 0; i < bloc.size(); i+=taille_bloc/8) {
+            ArrayList<Integer> sousBloc = new ArrayList<>() ;
+            for (int j = 0; j < taille_bloc/8; j++) {
+                sousBloc.add(bloc.get(j));
+            }
+            blocDecoupé.add(sousBloc);
+        }
+
+        return blocDecoupé;
+    }
+
+
+    public ArrayList<Integer> permutation(int[] perm_initiale, ArrayList<Integer> bloc){
+        ArrayList<Integer> tableau_permuté = new ArrayList<>();
+
+        for (int indicePermutation : perm_initiale) {
+            tableau_permuté.get(indicePermutation) = bloc.get(indicePermutation);
+        }
+
+        return tableau_permuté; 
+    }
+
+
     public static void main(String[] args) {
         Des des = new Des();
-        des.crypte("coucou");
-    
+        //System.out.println(des.crypte("coucou"));
+        ArrayList<ArrayList<Integer>> decoupage = (des.decoupage(des.crypte("coucou"), 64));
+        System.out.println(des.permutation(perm_initiale ,decoupage.get(0)));
     }
 
 }

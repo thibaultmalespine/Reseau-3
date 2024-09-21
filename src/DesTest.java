@@ -15,11 +15,11 @@ public class DesTest {
     }
 
     @Test
-    public void testTextTobitString() {
+    public void testStringTobitString() {
         String message = "alkndezndklznedlz";
-        String test1 = des.textTobitString(message);
+        String test1 = des.stringToBitString(message);
         assertEquals(test1.length(), message.length()*8);
-        String test2 = des.textTobitString("a");
+        String test2 = des.stringToBitString("a");
         assertEquals(test2, "0"+Integer.toBinaryString('a'));
     }
 
@@ -31,10 +31,16 @@ public class DesTest {
     }
 
     @Test
-    public void testStringToBits() {
+    public void testStringBitsToBits() {
         String s = "010111";
         int[] bloc = {0,1,0,1,1,1};
-        assertEquals(Arrays.toString(des.stringToBits(s)), Arrays.toString(bloc));
+        assertEquals(Arrays.toString(des.stringBitsToBits(s)), Arrays.toString(bloc));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testExceptionStringBitsToBits() {
+        String s = "mauvaise chaîne";
+        des.stringBitsToBits(s);
     }
 
     @Test

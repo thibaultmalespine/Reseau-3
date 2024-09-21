@@ -54,7 +54,7 @@ public class Des {
     int[] masterKey;
     ArrayList<int[]> tab_cles;
     /**
-     * initialise la masterKey et créé puis remplit tab_cles
+     * Initialise la masterKey et créé puis remplit tab_cles
      */
     public Des(){
         // génère la master key
@@ -77,7 +77,7 @@ public class Des {
 
         génèreClé(1);
         
-        String message_en_binaire = textTobitString(message_clair);
+        String message_en_binaire = stringToBitString(message_clair);
         ArrayList<String> message_découpé = découpageEnSousBloc(message_en_binaire, 64);
 
         for (String bout_de_message : message_découpé) {
@@ -90,7 +90,12 @@ public class Des {
 
     }
 
-    public String textTobitString(String message){
+    /**
+     * Transforme une chaîne de caractère dans sa représentation binaire 
+     * @param message Chaîne de caractère à transformer
+     * @return Une nouvelle chaîne de caractère, contient la représentation binaire
+     */
+    public String stringToBitString(String message){
         message.replaceAll(" ", "_");
 
         String message_en_binaire = "";
@@ -102,6 +107,11 @@ public class Des {
         
     }
 
+    /**
+     * Transforme un tableau d'entier en sa représentation sous forme de chaîne de caractère
+     * @param bloc 
+     * @return 
+     */
     public String bitsToString(int[] bloc){
         StringBuilder sb = new StringBuilder();
 
@@ -112,7 +122,19 @@ public class Des {
         return sb.toString();
     }
 
-    public  int[] stringToBits(String message){
+    /**
+     * Transfomre une chaîne de caractère binaire en tableau d'entier 
+     *
+     * @param message Doit être une chaîne de caractère binaire
+     * @return 
+     */
+    public  int[] stringBitsToBits(String message) throws IllegalArgumentException{
+        for (char c : message.toCharArray()) {
+            if (c != '0' && c != '1') {
+                throw new IllegalArgumentException("La chaîne doit être binaire !");
+            }
+        }
+
         int[] bits = new int[message.length()];
         for (int i = 0; i < message.length(); i++) {
             bits[i] = Character.getNumericValue(message.charAt(i));
@@ -163,8 +185,8 @@ public class Des {
 
 
         // On décalle vers la gauche  
-        Gauche = bitsToString(decalleGauche(stringToBits(Gauche), décallage)); 
-        Droite = bitsToString(decalleGauche(stringToBits(Droite), décallage));  
+        Gauche = bitsToString(decalleGauche(stringBitsToBits(Gauche), décallage)); 
+        Droite = bitsToString(decalleGauche(stringBitsToBits(Droite), décallage));  
 
         // On recolle les blocs
         Kn = recollageGaucheDroite(new String[]{Gauche,Droite}, 14);
@@ -173,7 +195,7 @@ public class Des {
         Kn = permutation(PC2, Kn);
 
         // Ajout de la nouvelle clé à tab_cles
-        tab_cles.add(stringToBits(Kn));
+        tab_cles.add(stringBitsToBits(Kn));
 
     }
     

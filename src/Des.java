@@ -35,6 +35,12 @@ public class Des {
         44,49,39,56,34,53,
         46,42,50,36,29,32
     };
+    static int[] P = {
+        16,7,20,21,29,12,28,17,
+        1,15,23,26,5,18,31,10,
+        2,8,24,14,32,27,3,9,
+        19,13,30,6,22,11,4,25
+    };
     static int[] S = {
         14,4,13,1,2,15,11,8,3,10,6,12,5,9,0,7,
         0,15,7,4,14,2,13,1,10,6,12,11,9,5,3,8,
@@ -51,10 +57,11 @@ public class Des {
         24,25,26,27,28,29,
         28,29,30,31,32,1
     };
+
     int[] masterKey;
     ArrayList<int[]> tab_cles;
     /**
-     * Initialise la masterKey et créé puis remplit tab_cles
+     * Initialise la masterKey et créé puis remplit tab_cles en générant les n clés
      */
     public Des(){
         // génère la master key
@@ -63,7 +70,7 @@ public class Des {
             masterKey[i] = r.nextInt(2);
         }
 
-        // génères les kn clés
+        // génères les n clés
         tab_cles = new ArrayList<>();
         // Table de décallage en fonction du numéro de ronde 
         int[] table_décallage = {1,1,2,2,2,2,2,1,2,2,2,2,2,2,1};
@@ -73,17 +80,32 @@ public class Des {
     }
 
     public void crypte(String message_clair){
+        // Etape 1 : texte en clair
         message_clair.replaceAll(" ", "_");
-
-        génèreClé(1);
         
+       
+        // Etape 2 : texte en binaire
         String message_en_binaire = stringToBitString(message_clair);
+        
+        // Etape 3 : découpage en blocs de 64 bits
         ArrayList<String> message_découpé = découpageEnSousBloc(message_en_binaire, 64);
 
         for (String bout_de_message : message_découpé) {
+            // Etape 4 : permutation initiale
             String bout_de_message_permuté = permutation(perm_initiale ,bout_de_message);
+            
+            // Etape 5 : découpage en deux bloc (haut/bas)
             String Gn = bout_de_message_permuté.substring(0,32);
             String Dn = bout_de_message_permuté.substring(32,64);
+
+            for (int i = 0; i < nb_ronde; i++) {
+                // Etape 6 : calcul de Dn+1 et Gn+1
+                String Gn_plus_1 = Dn;
+                String Dn_plus_1 = XOR(Gn, F(tab_cles.get(i), Dn));
+
+                Gn = Gn_plus_1;
+                Dn = Dn_plus_1;
+            }
 
         }
 
@@ -108,11 +130,11 @@ public class Des {
     }
 
     /**
-     * Transforme un tableau d'entier en sa représentation sous forme de chaîne de caractère
+     * Transforme un tableau d'entier en sa représentation sous forme de chaîne binaire
      * @param bloc 
-     * @return 
+     * @return une chaîne binaire
      */
-    public String bitsToString(int[] bloc){
+    public String bitsToStringBits(int[] bloc){
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < bloc.length; i++) {
@@ -143,6 +165,12 @@ public class Des {
         return bits;
     }
 
+    /**
+     * Prend une chaîne binaire est la découpe en sous chaîne binaire
+     * @param message_en_binaire 
+     * @param taille_bloc
+     * @return une liste de chaîne binaire
+     */
     public ArrayList<String> découpageEnSousBloc(String message_en_binaire, int taille_bloc){
         
         ArrayList<String> message_découpé = new ArrayList<>();
@@ -158,6 +186,12 @@ public class Des {
         return message_découpé; 
     }
 
+    /**
+     * Permute les bits d'une chaîne binaire à l'aide d'une table de permutation
+     * @param table_de_permutation
+     * @param message chaîne binaire
+     * @return une nouvelle chaîne binaire obtenu après permutation
+     */
     public String permutation(int[] table_de_permutation, String message){
         String message_permuté = "";
 
@@ -175,7 +209,7 @@ public class Des {
     private void génèreClé(int décallage){
         
         // Première permutation à l'aide de PC1 
-        String Kn = permutation(PC1, bitsToString(masterKey));
+        String Kn = permutation(PC1, bitsToStringBits(masterKey));
         
 
         // Séparation de la clé en deux
@@ -185,8 +219,8 @@ public class Des {
 
 
         // On décalle vers la gauche  
-        Gauche = bitsToString(decalleGauche(stringBitsToBits(Gauche), décallage)); 
-        Droite = bitsToString(decalleGauche(stringBitsToBits(Droite), décallage));  
+        Gauche = bitsToStringBits(decalleGauche(stringBitsToBits(Gauche), décallage)); 
+        Droite = bitsToStringBits(decalleGauche(stringBitsToBits(Droite), décallage));  
 
         // On recolle les blocs
         Kn = recollageGaucheDroite(new String[]{Gauche,Droite}, 14);
@@ -277,6 +311,67 @@ public class Des {
         return sb.toString();
     }
 
+    /**
+     * fonction F de l'algorithme DES
+     * 
+     * @param Kn clé numéro n
+     * @param Dn bloc droit numéro n
+     * @return
+     */
+    public String F(int[] Kn, String Dn) {
+        String Dn_prime = permutation(E, Dn);
+        
+        String Dn_etoile = XOR(Dn_prime, bitsToStringBits(Kn));
+        
+        ArrayList<String> blocs = découpageEnSousBloc(Dn_etoile, 6);
+        
+        String resultat_substitution = "";
+        for (String bloc : blocs) {
+        // faire une fonction substitutionS(S, bloc)
+
+            char[] data_ligne = {bloc.charAt(0), bloc.charAt(5)};
+            String binaire_ligne = new String(data_ligne);
+            int ligne = Integer.parseInt(binaire_ligne, 2);
+            
+            char[] data_colonne = {bloc.charAt(1),bloc.charAt(2),bloc.charAt(3),bloc.charAt(4)};
+            String binaire_colonne = new String(data_colonne);
+            int colonne = Integer.parseInt(binaire_colonne, 2);
+            
+            
+            bloc = Integer.toBinaryString(S[ligne * 16 + colonne]);
+            while (bloc.length() < 4) {
+                bloc = "0"+bloc;   
+            }
+            // fin substitutionS
+
+            resultat_substitution += bloc;
+        }   
+
+        return permutation(P, resultat_substitution);
+    }
+
+    /**
+     * Fait un Xor entre deux chaîne binaire de même longeur
+     * @param chaîne_binaire_1
+     * @param chaîne_binaire_2
+     * @return une nouvelle chaîne binaire, résultat du Xor
+     */
+    public String XOR(String chaîne_binaire_1, String chaîne_binaire_2) throws IllegalArgumentException{
+        if (chaîne_binaire_1.length() != chaîne_binaire_2.length()) {
+            throw new IllegalArgumentException("les deux chaînes binaires doivent être de même longeur !");
+        }
+
+        int[] chaîne_binaire_1_to_bits = stringBitsToBits(chaîne_binaire_1);
+        int[] chaîne_binaire_2_to_bits = stringBitsToBits(chaîne_binaire_2);
+        int[] result = new int[chaîne_binaire_1.length()];
+      
+        for (int i = 0; i < chaîne_binaire_1_to_bits.length ;i++) {
+            result[i] = chaîne_binaire_1_to_bits[i] ^ chaîne_binaire_2_to_bits[i]; 
+        }
+        return bitsToStringBits(result);
+    }
+
+
     public static void main(String[] args) {
         Des des = new Des();
         //des.crypte("coucou ");
@@ -284,8 +379,4 @@ public class Des {
             System.out.println(Arrays.toString(tab));
         }
     }
-
-
-
 }
-

@@ -24,10 +24,10 @@ public class DesTest {
     }
 
     @Test
-    public void testBitsToString() {
+    public void testBitsToStringBits() {
         int[] bloc = {0,1,0,1,1,1};
         String s = "010111";
-        assertEquals(des.bitsToString(bloc), s);
+        assertEquals(des.bitsToStringBits(bloc), s);
     }
 
     @Test
@@ -103,6 +103,16 @@ public class DesTest {
     @Test
     public void testRecollageGaucheDroite() {
         assertEquals(des.recollageGaucheDroite(new String[]{"00000000","11111111"}, 8), "0000111100001111");
+    }
+
+    @Test
+    public void testXOR() {
+        assertEquals(des.XOR("0101", "0011"), "0110");  
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testExceptionXOR() {
+        des.XOR("00", "1111");
     }
 
    

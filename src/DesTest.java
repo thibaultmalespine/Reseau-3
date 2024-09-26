@@ -24,6 +24,12 @@ public class DesTest {
     }
 
     @Test
+    public void testEstBinaire() {
+        assertEquals(des.estBinaire("00001010"), true);
+        assertEquals(des.estBinaire("101010121"), false);
+    }
+
+    @Test
     public void testBitsToStringBits() {
         int[] bloc = {0,1,0,1,1,1};
         String s = "010111";
@@ -115,5 +121,20 @@ public class DesTest {
         des.XOR("00", "1111");
     }
 
+    @Test
+    public void testSubstitutionS() {
+        assertEquals(des.substitutionS(Des.S, "000000"), "1110");
+        assertEquals(des.substitutionS(Des.S, "000001"), "0000");
+        assertEquals(des.substitutionS(Des.S, "111111"), "1101");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testExceptionTailleSubstitutionS() {
+        des.substitutionS(Des.S, "00000");
+    }
+    @Test(expected = IllegalArgumentException.class)
+    public void testExceptionTypeSubstitutionS() {
+        des.substitutionS(Des.S, "chaîne non binaire");
+    }
    
 }

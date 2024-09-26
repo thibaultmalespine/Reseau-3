@@ -1,5 +1,8 @@
 DES VERSION 1
 
-Créer la fonction substitutionS (en reprenant le code dans la fonction F) et la tester
-Terminer la fonction crypte (étape 2.5)
-Faire le fonction décrypte
+QUESTIONS
+- Pour générer les kn clés utilisé durant les n rondes, faut il utiliser une même master clé ou à chaque fois une différente ?
+- Est ce que la table PI-1 du cours correspond à la table inverse de PI ? Faut il utiliser cette table en dur où utiliser une fonction invPermutation
+
+Faire la fonction décrypte
+    - Faire une fonction invPermutation

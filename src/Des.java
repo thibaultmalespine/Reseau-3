@@ -1,6 +1,5 @@
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 
 public class Des {
@@ -18,6 +17,16 @@ public class Des {
         59,51,43,35,27,19,11,3,
         61,53,45,37,29,21,13,5,
         63,55,47,39,31,23,15,7
+    };
+    static int[] perm_inverse = {
+        40,8,48,16,56,24,64,32,
+        39,7,47,15,55,23,63,31,
+        38,6,46,14,54,22,62,30,
+        37,5,45,13,53,21,61,29,
+        36,4,44,12,52,20,60,28,
+        35,3,43,11,51,19,59,27,
+        34,2,42,10,50,18,58,26,
+        33,1,41,9,49,17,57,25
     };
     static int[] PC1 = {
         57,49,41,33,25,17,9,63,55,47,39,31,23,15,
@@ -61,7 +70,7 @@ public class Des {
     int[] masterKey;
     ArrayList<int[]> tab_cles;
     /**
-     * Initialise la masterKey et créé puis remplit tab_cles en générant les n clés
+     * Initialise la masterKey, puis créer et remplit tab_cles en générant les n clés
      */
     public Des(){
         // génère la master key
@@ -72,34 +81,37 @@ public class Des {
 
         // génères les n clés
         tab_cles = new ArrayList<>();
-        // Table de décallage en fonction du numéro de ronde 
+            // Table de décallage en fonction du numéro de ronde 
         int[] table_décallage = {1,1,2,2,2,2,2,1,2,2,2,2,2,2,1};
         for (int i = 0; i < nb_ronde; i++) {
             génèreClé(table_décallage[i]);
         }
     }
 
-    public void crypte(String message_clair){
-        // Etape 1 : texte en clair
-        message_clair.replaceAll(" ", "_");
+    /**
+     * Crypte un message via l'algorithme DES
+     * @param message_clair 
+     * @return le message crypté sous forme de chaîne binaire
+     */
+    public String crypte(String message_clair){
+        String message_crypté = "";
         
-       
-        // Etape 2 : texte en binaire
+        // Etape 1 : texte en binaire
         String message_en_binaire = stringToBitString(message_clair);
         
-        // Etape 3 : découpage en blocs de 64 bits
+        // Etape 2 : découpage en blocs de 64 bits
         ArrayList<String> message_découpé = découpageEnSousBloc(message_en_binaire, 64);
 
         for (String bout_de_message : message_découpé) {
-            // Etape 4 : permutation initiale
+            // Etape 3 : permutation initiale
             String bout_de_message_permuté = permutation(perm_initiale ,bout_de_message);
             
-            // Etape 5 : découpage en deux bloc (haut/bas)
+            // Etape 4 : découpage en deux bloc (haut/bas)
             String Gn = bout_de_message_permuté.substring(0,32);
             String Dn = bout_de_message_permuté.substring(32,64);
 
             for (int i = 0; i < nb_ronde; i++) {
-                // Etape 6 : calcul de Dn+1 et Gn+1
+                // Etape 5 : calcul de Dn+1 et Gn+1
                 String Gn_plus_1 = Dn;
                 String Dn_plus_1 = XOR(Gn, F(tab_cles.get(i), Dn));
 
@@ -107,9 +119,17 @@ public class Des {
                 Dn = Dn_plus_1;
             }
 
+            // Etape 6 : on réunit G et D
+            String bout_de_message_après_ronde = Gn + Dn;
+
+            // Etape 7 : permutation inverse de perm_initiale
+            String bout_de_message_crypté = permutation(perm_inverse, bout_de_message_après_ronde);
+       
+            // Etape 8 : assemblage des blocs crypté
+            message_crypté += bout_de_message_crypté; 
         }
 
-
+        return message_crypté;
     }
 
     /**
@@ -124,9 +144,21 @@ public class Des {
         for (char c : message.toCharArray()) {
             message_en_binaire += "0"+Integer.toBinaryString(c);
         }
+        return message_en_binaire;   
+    }
 
-        return message_en_binaire;
-        
+    /**
+     * petite fonction pour tester si une chaîne de caractère est une chaîne binaire 
+     * @param chaine
+     * @return
+     */
+    public boolean estBinaire(String chaine) {
+        for (char c : chaine.toCharArray()) {
+            if (c != '0' && c != '1') {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -198,7 +230,6 @@ public class Des {
         for (int indice : table_de_permutation) {
             message_permuté += message.charAt(indice-1);
         }
-
         return message_permuté;
     }
 
@@ -211,12 +242,10 @@ public class Des {
         // Première permutation à l'aide de PC1 
         String Kn = permutation(PC1, bitsToStringBits(masterKey));
         
-
         // Séparation de la clé en deux
         String[] Kn_séparé = découpageGaucheDroite(Kn, 14);
         String Gauche = Kn_séparé[0];
         String Droite = Kn_séparé[1];
-
 
         // On décalle vers la gauche  
         Gauche = bitsToStringBits(decalleGauche(stringBitsToBits(Gauche), décallage)); 
@@ -230,7 +259,6 @@ public class Des {
 
         // Ajout de la nouvelle clé à tab_cles
         tab_cles.add(stringBitsToBits(Kn));
-
     }
     
     /**
@@ -257,9 +285,7 @@ public class Des {
                 Droite += tableau.charAt(i);
             }
         }
-
         return new String[]{Gauche,Droite};
-
     }
     
     /**
@@ -281,7 +307,6 @@ public class Des {
                 bloc_decalle[i] = 0;
             }
         }
-
         return bloc_decalle;
     }
 
@@ -327,24 +352,7 @@ public class Des {
         
         String resultat_substitution = "";
         for (String bloc : blocs) {
-        // faire une fonction substitutionS(S, bloc)
-
-            char[] data_ligne = {bloc.charAt(0), bloc.charAt(5)};
-            String binaire_ligne = new String(data_ligne);
-            int ligne = Integer.parseInt(binaire_ligne, 2);
-            
-            char[] data_colonne = {bloc.charAt(1),bloc.charAt(2),bloc.charAt(3),bloc.charAt(4)};
-            String binaire_colonne = new String(data_colonne);
-            int colonne = Integer.parseInt(binaire_colonne, 2);
-            
-            
-            bloc = Integer.toBinaryString(S[ligne * 16 + colonne]);
-            while (bloc.length() < 4) {
-                bloc = "0"+bloc;   
-            }
-            // fin substitutionS
-
-            resultat_substitution += bloc;
+            resultat_substitution += substitutionS(S, bloc);
         }   
 
         return permutation(P, resultat_substitution);
@@ -371,12 +379,31 @@ public class Des {
         return bitsToStringBits(result);
     }
 
+    /**
+     * Sous fonction de la fonction F
+     * @param S fonction de subtitution S, type int[] 
+     * @param bloc chaîne binaire à substituer, de taille 6
+     * @return une nouvelle chaîne binaire de taille 4
+     */
+    public String substitutionS(int[] S, String bloc) throws IllegalArgumentException{
+
+        if (bloc.length() != 6 || !estBinaire(bloc)) {
+            throw new IllegalArgumentException("le paramètre bloc doit être une chaîne binaire de taille 6");
+        }
+
+        int ligne = Integer.parseInt(bloc.substring(0, 1)+bloc.substring(5,6) , 2);
+        int colonne = Integer.parseInt(bloc.substring(1,5), 2);
+        
+        bloc = Integer.toBinaryString(S[ligne * 16 + colonne]);
+        while (bloc.length() < 4) {
+            bloc = "0"+bloc;   
+        }
+        return bloc;
+    }
 
     public static void main(String[] args) {
         Des des = new Des();
-        //des.crypte("coucou ");
-        for (int[] tab : des.tab_cles) {
-            System.out.println(Arrays.toString(tab));
-        }
+        System.out.println(des.crypte("coucou"));
+        System.out.println(des.crypte("coucou"));
     }
 }

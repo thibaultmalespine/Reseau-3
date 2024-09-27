@@ -1,5 +1,6 @@
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 public class Des {
@@ -234,6 +235,28 @@ public class Des {
     }
 
     /**
+     * Permet d'inverser la permutation effectué sur message_inversé
+     * @param table_de_permutation
+     * @param message_inversé
+     * @return le message binaire avant permutation
+     */
+    public String invPermutation(int[] table_de_permutation, String message_permuté){
+        String message = "";
+        int taille_message = Arrays.stream(table_de_permutation).max().getAsInt();
+
+        for (int i = 1; i < taille_message+1; i++) {
+            int y = 0;
+
+            while(table_de_permutation[y] != i  ){
+                y++;
+            }
+            message += message_permuté.charAt(y);
+        }
+
+        return message;
+    }
+
+    /**
      * Fonction qui génère une Kn clé, puis l'ajoute à tab_cles 
      * @param décallage nombre de bits décaller vers la gauche en fonction du numéro de ronde
      */
@@ -401,9 +424,30 @@ public class Des {
         return bloc;
     }
 
+    /**
+     * décrypte un message crypté à l'aide de l'algorithme DES
+     * @param message_crypté
+     * @return le message décrypté
+     */
+    public String decrypte(String message_crypté){
+        // Etape 1 : découpage en bloc de 64 bits
+        ArrayList<String> message_découpé = découpageEnSousBloc(message_crypté, 64);  
+        
+        // Etape 2 : faire une permutation à l'aide de perm_init sur chaque sous-bloc
+        for (String bout_de_message : message_découpé) {
+            String bout_de_message_permuté = permutation(perm_initiale, bout_de_message);
+
+            // Etape 3 : faire les rondes dans le sens inverse
+            for (int i = 0; i < nb_ronde; i++) {
+                
+            }
+        }
+        
+        return "";
+    }
+
     public static void main(String[] args) {
         Des des = new Des();
-        System.out.println(des.crypte("coucou"));
         System.out.println(des.crypte("coucou"));
     }
 }

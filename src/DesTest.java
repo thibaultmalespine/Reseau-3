@@ -85,6 +85,25 @@ public class DesTest {
     }
 
     @Test
+    public void testInvPermutation() {
+        // Test sur un cas simple
+        String message = "0101";
+        int[] tab_perm = new int[]{3,1,4,2};
+        String message_permuté = des.permutation(tab_perm,message);
+        assertEquals(message_permuté, "0011");
+        assertEquals(des.invPermutation(tab_perm, message_permuté), message);
+
+        // Test sur un bloc de taille 32 et E
+        String message32bits = "01110000"
+                        +"10001111"
+                        +"11001011"
+                        +"10011010";
+
+        assertEquals(message32bits, des.invPermutation(Des.E, des.permutation(Des.E,message32bits)));
+    }
+
+
+    @Test
     public void testDecalleGauche() {
         int[] message = {1,0,0,1,1,0};
         

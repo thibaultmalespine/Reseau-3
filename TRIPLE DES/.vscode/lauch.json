@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "TripleDes",
+            "request": "launch",
+            "mainClass": "TripleDes",
+            "projectName": "TRIPLE DES",
+            "vmArgs": "-Dfile.encoding=UTF-8"
+        }
+    ]
+}

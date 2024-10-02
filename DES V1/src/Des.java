@@ -88,7 +88,7 @@ public class Des {
         // génères les n clés
         tab_cles = new ArrayList<>();
             // Table de décallage en fonction du numéro de ronde 
-        int[] table_décallage = {1,1,2,2,2,2,2,1,2,2,2,2,2,2,1};
+        int[] table_décallage = {1,1,2,2,2,2,2,2,1,2,2,2,2,2,2,1};
         for (int i = 0; i < nb_ronde; i++) {
             génèreClé(table_décallage[i]);
         }

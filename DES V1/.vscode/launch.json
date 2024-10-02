@@ -6,6 +6,20 @@
             "name": "Des",
             "request": "launch",
             "mainClass": "Des",
+            "projectName": "DES V1_842a6f6"
+        },
+        {
+            "type": "java",
+            "name": "App",
+            "request": "launch",
+            "mainClass": "App",
+            "projectName": "DES V1_842a6f6"
+        },
+        {
+            "type": "java",
+            "name": "Des",
+            "request": "launch",
+            "mainClass": "Des",
             "projectName": "Reseau-3_c867c942"
         },
         {

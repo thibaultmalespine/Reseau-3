@@ -1,4 +1,6 @@
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,6 +23,18 @@ public class DesTest {
         assertEquals(test1.length(), message.length()*8);
         String test2 = des.stringToBitString("a");
         assertEquals(test2, "0"+Integer.toBinaryString('a'));
+
+        message = "espace ici";
+        String test3 = des.stringToBitString(message);
+        assertEquals(test3.length(), message.length()*8);
+
+    }
+
+    @Test
+    public void testBitStringToString() {
+        assertEquals(des.bitStringToString(des.stringToBitString("a")), "a");
+        assertEquals(des.bitStringToString(des.stringToBitString("salut")), "salut");
+        assertEquals(des.bitStringToString(des.stringToBitString("espace dans la phrase")), "espace dans la phrase");
     }
 
     @Test
@@ -113,24 +127,6 @@ public class DesTest {
     }
 
     @Test
-    public void testDécoupageGaucheDroite() {
-        String texte_à_decouper = "00001111"
-                                 +"00001111";
-
-        // test de la partie gauche
-        assertEquals(des.découpageGaucheDroite(texte_à_decouper, 8)[0], "0000"
-                                                                                      +"0000");
-        // test de la partie droite
-        assertEquals(des.découpageGaucheDroite(texte_à_decouper, 8)[1], "1111"
-                                                                                      +"1111");
-    }
-
-    @Test
-    public void testRecollageGaucheDroite() {
-        assertEquals(des.recollageGaucheDroite(new String[]{"00000000","11111111"}, 8), "0000111100001111");
-    }
-
-    @Test
     public void testXOR() {
         assertEquals(des.XOR("0101", "0011"), "0110");  
     }
@@ -144,6 +140,7 @@ public class DesTest {
     public void testSubstitutionS() {
         assertEquals(des.substitutionS(Des.S, "000000"), "1110");
         assertEquals(des.substitutionS(Des.S, "000001"), "0000");
+        assertEquals(des.substitutionS(Des.S, "011110"), "0111");
         assertEquals(des.substitutionS(Des.S, "111111"), "1101");
     }
 
@@ -154,6 +151,19 @@ public class DesTest {
     @Test(expected = IllegalArgumentException.class)
     public void testExceptionTypeSubstitutionS() {
         des.substitutionS(Des.S, "chaîne non binaire");
+    }
+
+    @Test
+    public void testCrypte() {
+        String message = "salut à tous";
+        assertNotEquals(des.crypte(message), message);
+        assertTrue(des.estBinaire(des.crypte(message)));    
+    }
+
+    @Test
+    public void testDecrypte() {
+        String message = "salut à tous @info, étonnant non ? 😀";
+        assertEquals(message, des.decrypte(des.crypte(message)));
     }
    
 }

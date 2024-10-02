@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Des",
+            "request": "launch",
+            "mainClass": "Des",
+            "projectName": "Reseau-3_c867c942"
+        },
+        {
+            "type": "java",
+            "name": "Exécuter mon application",
+            "request": "launch",
+            "mainClass": "votre.package.VotreClassePrincipale",
+            "vmArgs": "-Dfile.encoding=UTF-8"
+        }
+    ]
+}

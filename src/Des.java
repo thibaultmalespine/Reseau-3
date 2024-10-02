@@ -1,4 +1,5 @@
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -30,10 +31,14 @@ public class Des {
         33,1,41,9,49,17,57,25
     };
     static int[] PC1 = {
-        57,49,41,33,25,17,9,63,55,47,39,31,23,15,
-        1,58,50,42,34,26,18,07,62,54,46,30,30,22,
-        10,2,59,51,43,35,27,14,6,61,53,45,37,29,
-        19,11,3,60,52,44,36,21,13,5,28,20,12,4
+        57,49,41,33,25,17,9,
+        1,58,50,42,34,26,18,
+        10,2,59,51,43,35,27,
+        19,11,3,60,52,44,36,
+        63,55,47,39,31,23,15,
+        7,62,54,46,38,30,22,
+        14,6,61,53,45,37,29,
+        21,13,5,28,20,12,4
     };
     static int[] PC2 = {
         14,17,11,24,1,5,
@@ -139,13 +144,65 @@ public class Des {
      * @return Une nouvelle chaîne de caractère, contient la représentation binaire
      */
     public String stringToBitString(String message){
-        message.replaceAll(" ", "_");
+        message = message.replaceAll(" ", "_");
 
         String message_en_binaire = "";
-        for (char c : message.toCharArray()) {
-            message_en_binaire += "0"+Integer.toBinaryString(c);
+        byte[] bytes = message.getBytes(StandardCharsets.UTF_8);
+        for (byte b : bytes) {
+            String binary = String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0');
+            message_en_binaire += binary;
         }
+
         return message_en_binaire;   
+    }
+
+    /**
+ * Transforme une chaîne binaire dans sa représentation en chaîne de caractères
+ * @param bitString Chaîne binaire à transformer
+ * @return Une nouvelle chaîne de caractère
+ */
+    public String bitStringToString(String bitString) {
+        String message = "";
+        int i = 0;
+        
+        while (i < bitString.length()){
+          
+            if (bitString.charAt(i) == '0') {
+                message += décoderCharactère(bitString.substring(i, i+8));
+                i += 8;
+            }
+            else if (bitString.substring(i, i+3).equals("110")) {
+                message += décoderCharactère(bitString.substring(i, i+16));
+                i += 16;
+            }
+            else if (bitString.substring(i, i+4).equals("1110")){
+                message += décoderCharactère(bitString.substring(i, i+24));
+                i += 24;            
+            }
+            else {
+                message += décoderCharactère(bitString.substring(i, i+32));
+                i += 32;
+            }
+        }
+         
+        message = message.replaceAll("_", " ");
+        
+        return message;
+    }
+
+    /**
+     * Décode un charactère encoder en utf-8
+     * @param chaîne_binaire 
+     * @return
+     */
+    public String décoderCharactère(String chaîne_binaire){
+        byte[] octets = new byte[chaîne_binaire.length() / 8];
+        int i = 0;
+        for(String octet : découpageEnSousBloc(chaîne_binaire, 8)){
+            octets[i] = (byte) Integer.parseInt(octet, 2);
+            i++;
+        }
+        return new String(octets, StandardCharsets.UTF_8);
     }
 
     /**
@@ -178,7 +235,7 @@ public class Des {
     }
 
     /**
-     * Transfomre une chaîne de caractère binaire en tableau d'entier 
+     * Transforme une chaîne de caractère binaire en tableau d'entier 
      *
      * @param message Doit être une chaîne de caractère binaire
      * @return 
@@ -266,16 +323,15 @@ public class Des {
         String Kn = permutation(PC1, bitsToStringBits(masterKey));
         
         // Séparation de la clé en deux
-        String[] Kn_séparé = découpageGaucheDroite(Kn, 14);
-        String Gauche = Kn_séparé[0];
-        String Droite = Kn_séparé[1];
+        String Gauche = Kn.substring(0,28);
+        String Droite = Kn.substring(28, 56);
 
         // On décalle vers la gauche  
         Gauche = bitsToStringBits(decalleGauche(stringBitsToBits(Gauche), décallage)); 
         Droite = bitsToStringBits(decalleGauche(stringBitsToBits(Droite), décallage));  
 
         // On recolle les blocs
-        Kn = recollageGaucheDroite(new String[]{Gauche,Droite}, 14);
+        Kn = Gauche + Droite;
 
         // Seconde permutation à l'aide de PC2
         Kn = permutation(PC2, Kn);
@@ -283,34 +339,7 @@ public class Des {
         // Ajout de la nouvelle clé à tab_cles
         tab_cles.add(stringBitsToBits(Kn));
     }
-    
-    /**
-     * Scinde un tableau en deux : sa partie gauche et sa partie droite
-     * @param tableau doit avoir une longueur qui est un chiffre pair
-     * @param largeur_tableau largeur du tableau d'entrée
-     * @return
-     * @throws IllegalArgumentException
-     */
-    public String[] découpageGaucheDroite(String tableau, int largeur_tableau) throws IllegalArgumentException {
-        if (largeur_tableau % 2 != 0) {
-            throw new IllegalArgumentException("la largeur du tableau doit être un nombre pair !");
-        }
-
-        String Gauche = new String();
-        String Droite  = new String();
-        
-        for (int i = 0; i < tableau.length(); i++) {
-            if (i % largeur_tableau < largeur_tableau/2) {
-                Gauche += tableau.charAt(i); 
-               
-            }
-            else {
-                Droite += tableau.charAt(i);
-            }
-        }
-        return new String[]{Gauche,Droite};
-    }
-    
+       
     /**
      * Effectue un décallage vers la gauche de l'ensemble des entiers contenu dans bloc,
      * les derniers indice sont remplacés par des 0
@@ -331,32 +360,6 @@ public class Des {
             }
         }
         return bloc_decalle;
-    }
-
-    /**
-     * Colle deux tableaux entre eux
-     * @param tableaux_à_coller sous forme de String[], doit avoir une taille de 2
-     * @param largeur_tableau largeur du tableau de sortie
-     * @return 
-     * @throws IllegalArgumentException
-     */
-    public String recollageGaucheDroite(String[] tableaux_à_coller, int largeur_tableau)throws IllegalArgumentException{
-        if (tableaux_à_coller.length != 2) {
-            throw new IllegalArgumentException("le paramètre tableaux_à_coller doit être de taille 2 !");
-        }
-        
-        int taille_total_textes = tableaux_à_coller[0].length() + tableaux_à_coller[1].length();
-        
-        StringBuilder sb = new StringBuilder(tableaux_à_coller[0]+tableaux_à_coller[1]);
-        for (int i = 0; i < taille_total_textes; i++) {
-            if (i % largeur_tableau < largeur_tableau/2) {
-                sb.setCharAt(i, tableaux_à_coller[0].charAt((i/largeur_tableau)*(largeur_tableau/2) + i%largeur_tableau));
-            }
-            else {
-                sb.setCharAt(i, tableaux_à_coller[1].charAt((i/largeur_tableau)*(largeur_tableau/2) + (i%largeur_tableau)-(largeur_tableau/2)));
-            }
-        }
-        return sb.toString();
     }
 
     /**
@@ -430,24 +433,43 @@ public class Des {
      * @return le message décrypté
      */
     public String decrypte(String message_crypté){
+
+        String message_décrypté = "";
+        
         // Etape 1 : découpage en bloc de 64 bits
         ArrayList<String> message_découpé = découpageEnSousBloc(message_crypté, 64);  
         
-        // Etape 2 : faire une permutation à l'aide de perm_init sur chaque sous-bloc
         for (String bout_de_message : message_découpé) {
+            // Etape 2 : faire une permutation à l'aide de perm_init sur chaque sous-bloc
             String bout_de_message_permuté = permutation(perm_initiale, bout_de_message);
-
+            
             // Etape 3 : faire les rondes dans le sens inverse
-            for (int i = 0; i < nb_ronde; i++) {
-                
+            String Gn = bout_de_message_permuté.substring(0,32);
+            String Dn = bout_de_message_permuté.substring(32,64);
+            
+            for (int i = nb_ronde-1; i >= 0; i--) {
+                String Dn_moins_1 = Gn;
+                String Gn_moins_1 = XOR(Dn, F(tab_cles.get(i), Dn_moins_1));
+
+                Gn = Gn_moins_1;
+                Dn = Dn_moins_1;
             }
+            
+            // Etape 4 : on réunit G et D
+            String bout_de_message_après_ronde = Gn + Dn;
+
+            // Etape 5 : permutation inverse de perm_initiale
+            String bout_de_message_décrypté = permutation(perm_inverse, bout_de_message_après_ronde);
+       
+            // Etape 6 : assemblage des blocs décrypté
+            message_décrypté += bout_de_message_décrypté; 
         }
-        
-        return "";
+
+        // Etape 7 : on passe le texte binaire en texte clair
+        return bitStringToString(message_décrypté).trim();
     }
 
     public static void main(String[] args) {
         Des des = new Des();
-        System.out.println(des.crypte("coucou"));
     }
 }

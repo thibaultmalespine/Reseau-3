@@ -241,6 +241,7 @@ public class Des {
     public  int[] stringBitsToBits(String message) throws IllegalArgumentException{
         for (char c : message.toCharArray()) {
             if (c != '0' && c != '1') {
+                System.out.println("character : "+c);
                 throw new IllegalArgumentException("La chaîne doit être binaire !");
             }
         }

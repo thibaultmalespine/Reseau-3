@@ -471,5 +471,6 @@ public class Des {
 
     public static void main(String[] args) {
         Des des = new Des();
+        System.out.println(des.decrypte(des.crypte("salut à tous @info, étonnant non ? 😀")));
     }
 }

@@ -13,7 +13,7 @@ public class DesTest {
 
     @Before
     public void setup(){
-        des = new Des();
+        des = new Des(MasterKey.createMasterKey());
     }
 
     @Test
@@ -53,12 +53,6 @@ public class DesTest {
         assertEquals(des.décoderCharactère("111000101001001010111110"), "Ⓘ");
         assertEquals(des.décoderCharactère("11110000100110001001100010010000"), "𘘐");
         assertNotEquals(des.décoderCharactère("11110000100110001001100010010001"), "𘘐");
-    }
-
-    @Test
-    public void testEstBinaire() {
-        assertEquals(des.estBinaire("00001010"), true);
-        assertEquals(des.estBinaire("101010121"), false);
     }
 
     @Test
@@ -104,7 +98,7 @@ public class DesTest {
             }
             else { message_permuté += "0";}
         }
-        String test1 = des.permutation(Des.perm_initiale, message);
+        String test1 = des.permutation(TablePermutation.perm_initiale, message);
         assertEquals(test1, message_permuté);
 
         // autre test
@@ -131,7 +125,7 @@ public class DesTest {
                         +"11001011"
                         +"10011010";
 
-        assertEquals(message32bits, des.invPermutation(Des.E, des.permutation(Des.E,message32bits)));
+        assertEquals(message32bits, des.invPermutation(TablePermutation.E, des.permutation(TablePermutation.E,message32bits)));
     }
 
 
@@ -177,7 +171,7 @@ public class DesTest {
         String message_crypté = des.crypte(message);
 
         assertNotEquals(message_crypté, message);
-        assertTrue(des.estBinaire(message_crypté)); 
+        assertTrue(ChaineBinaire.estBinaire(message_crypté)); 
         
         assertEquals(message, des.decrypte(message_crypté));
 

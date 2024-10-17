@@ -1,7 +1,11 @@
+package Controller;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import Model.TablePermutation;
+import Model.TableS;
 
 public class Des {
     static int taille_bloc = 64;

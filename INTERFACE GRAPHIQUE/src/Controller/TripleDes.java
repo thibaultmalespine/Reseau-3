@@ -1,8 +1,9 @@
+package Controller;
 import java.util.List;
 
 public class TripleDes {
     private Des des1, des2, des3;
-    String masterKey1, masterKey2, masterKey3;
+    public String masterKey1, masterKey2, masterKey3;
  
     /**
      * Initialise les 3 des nécessaire au fonctionnement du triple des

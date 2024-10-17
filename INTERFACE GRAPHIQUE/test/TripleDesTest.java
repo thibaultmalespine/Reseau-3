@@ -7,6 +7,10 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 
+import Controller.ChaineBinaire;
+import Controller.TripleDes;
+import Model.MasterKey;
+
 public class TripleDesTest {
     
     TripleDes triple_des;

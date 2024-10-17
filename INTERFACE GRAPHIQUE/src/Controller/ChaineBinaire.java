@@ -1,3 +1,4 @@
+package Controller;
 public class ChaineBinaire {
     /**
      * petite fonction pour tester si une chaîne de caractère est une chaîne binaire 

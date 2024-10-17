@@ -7,6 +7,12 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 
+import Controller.ChaineBinaire;
+import Controller.Des;
+import Model.MasterKey;
+import Model.TablePermutation;
+import Model.TableS;
+
 public class DesTest {
     Des des;
 

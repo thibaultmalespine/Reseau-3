@@ -3,6 +3,8 @@ import static org.junit.Assert.assertNotEquals;
 
 import org.junit.Test;
 
+import Model.MasterKey;
+
 public class MasterKeyTest {
     @Test
     public void testCreateMasterKey() {

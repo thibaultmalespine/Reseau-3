@@ -1,3 +1,4 @@
+package View;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -23,6 +24,9 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import Controller.TripleDes;
+import Model.MasterKey;
 
 
 public class Fenetre extends JFrame {
@@ -221,7 +225,4 @@ public class Fenetre extends JFrame {
         return master_keys;
     }
 
-    public static void main(String[] args) {
-        Fenetre f = new Fenetre();
-    }
 }

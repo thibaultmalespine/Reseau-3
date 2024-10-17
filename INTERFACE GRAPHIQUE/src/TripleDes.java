@@ -2,13 +2,13 @@ import java.util.List;
 
 public class TripleDes {
     private Des des1, des2, des3;
-    int[] masterKey1, masterKey2, masterKey3;
+    String masterKey1, masterKey2, masterKey3;
  
     /**
      * Initialise les 3 des nécessaire au fonctionnement du triple des
      * @param masterKeys ensemble de 3 clés
      */
-    public TripleDes(List<int[]> masterKeys) throws IllegalArgumentException{
+    public TripleDes(List<String> masterKeys) throws IllegalArgumentException{
         if (masterKeys.size() != 3) {
             throw new IllegalArgumentException("l'argument masterKeys doit contenir 3 master keys !");
         }

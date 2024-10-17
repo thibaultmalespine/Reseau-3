@@ -6,14 +6,15 @@ import org.junit.Test;
 public class MasterKeyTest {
     @Test
     public void testCreateMasterKey() {
-        int[] master_key = MasterKey.createMasterKey(); 
-        for (int bit : master_key) {
-            assertEquals(bit == 0 || bit == 1, true);
-        } 
+        String master_key = MasterKey.createMasterKey(); 
+        for (int i = 0; i < master_key.length(); i++) {
+            char bit = master_key.charAt(i);
+            assertEquals(bit == '0' || bit == '1', true);
+        }
 
-        assertEquals(master_key.length, 64);
+        assertEquals(master_key.length(), 64);
 
-        int[] master_key_2 = MasterKey.createMasterKey();
+        String master_key_2 = MasterKey.createMasterKey();
 
         assertNotEquals(master_key, master_key_2);
     }

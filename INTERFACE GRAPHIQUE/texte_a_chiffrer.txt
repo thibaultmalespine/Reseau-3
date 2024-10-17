@@ -1,0 +1,4 @@
+Le chiffrement est essentiel pour sécuriser les données sensibles. 
+Il permet de protéger les informations contre les accès non autorisés. 
+Cette méthode est largement utilisée dans les transactions en ligne, les communications sécurisées et le stockage de données confidentielles. 
+Utiliser des algorithmes puissants est crucial pour garantir la confidentialité et l'intégrité des données échangées.

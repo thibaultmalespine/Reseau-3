@@ -3,7 +3,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -53,26 +52,6 @@ public class DesTest {
         assertEquals(des.décoderCharactère("111000101001001010111110"), "Ⓘ");
         assertEquals(des.décoderCharactère("11110000100110001001100010010000"), "𘘐");
         assertNotEquals(des.décoderCharactère("11110000100110001001100010010001"), "𘘐");
-    }
-
-    @Test
-    public void testBitsToStringBits() {
-        int[] bloc = {0,1,0,1,1,1};
-        String s = "010111";
-        assertEquals(des.bitsToStringBits(bloc), s);
-    }
-
-    @Test
-    public void testStringBitsToBits() {
-        String s = "010111";
-        int[] bloc = {0,1,0,1,1,1};
-        assertEquals(Arrays.toString(des.stringBitsToBits(s)), Arrays.toString(bloc));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testExceptionStringBitsToBits() {
-        String s = "mauvaise chaîne";
-        des.stringBitsToBits(s);
     }
 
     @Test
@@ -131,11 +110,11 @@ public class DesTest {
 
     @Test
     public void testDecalleGauche() {
-        int[] message = {1,0,0,1,1,0};
+        String message = "100110";
         
-        assertEquals(Arrays.toString(des.decalleGauche(message, 0)), Arrays.toString(message));
-        assertEquals(Arrays.toString(des.decalleGauche(message, 1)), Arrays.toString(new int[]{0,0,1,1,0,0}));
-        assertEquals(Arrays.toString(des.decalleGauche(message, 2)), Arrays.toString(new int[]{0,1,1,0,0,0}));
+        assertEquals(des.decalleGauche(message, 0), message);
+        assertEquals(des.decalleGauche(message, 1), "001100");
+        assertEquals(des.decalleGauche(message, 2), "011000");
     }
 
     @Test

@@ -8,16 +8,15 @@ public class Des {
     static int taille_sous_bloc = 32;
     static int nb_ronde = 16;
     static int[] tab_decalage = new int[64];
-    
 
-    int[] masterKey;
-    ArrayList<int[]> tab_cles;
+    String masterKey;
+    ArrayList<String> tab_cles;
 
     /**
      * Initialise la masterKey, puis créer et remplit tab_cles en générant les n clés
      * @param utf8 indique si l'encodage se fait en utf8 où non
      */
-    public Des(int[] masterKey){
+    public Des(String masterKey){
         this.masterKey = masterKey;
 
         // génères les n clés
@@ -94,10 +93,10 @@ public class Des {
     }
 
     /**
- * Transforme une chaîne binaire dans sa représentation en chaîne de caractères
- * @param bitString Chaîne binaire à transformer
- * @return Une nouvelle chaîne de caractère
- */
+     * Transforme une chaîne binaire dans sa représentation en chaîne de caractères
+     * @param bitString Chaîne binaire à transformer
+     * @return Une nouvelle chaîne de caractère
+     */
     public String bitStringToString(String binary_string) {
  
         String message = "";
@@ -140,44 +139,6 @@ public class Des {
             i++;
         }
         return new String(octets, StandardCharsets.UTF_8);
-    }
-
-
-    /**
-     * Transforme un tableau d'entier en sa représentation sous forme de chaîne binaire
-     * @param bloc 
-     * @return une chaîne binaire
-     */
-    public String bitsToStringBits(int[] bloc){
-        StringBuilder sb = new StringBuilder();
-
-        for (int i = 0; i < bloc.length; i++) {
-            sb.append(bloc[i]);
-        }
-        
-        return sb.toString();
-    }
-
-    /**
-     * Transforme une chaîne de caractère binaire en tableau d'entier 
-     *
-     * @param message Doit être une chaîne de caractère binaire
-     * @return 
-     */
-    public  int[] stringBitsToBits(String message) throws IllegalArgumentException{
-        for (char c : message.toCharArray()) {
-            if (c != '0' && c != '1') {
-                System.out.println("character : "+c);
-                throw new IllegalArgumentException("La chaîne doit être binaire !");
-            }
-        }
-
-        int[] bits = new int[message.length()];
-        for (int i = 0; i < message.length(); i++) {
-            bits[i] = Character.getNumericValue(message.charAt(i));
-        }
-
-        return bits;
     }
 
     /**
@@ -245,15 +206,15 @@ public class Des {
     private void génèreClé(int décallage){
         
         // Première permutation à l'aide de PC1 
-        String Kn = permutation(TablePermutation.PC1, bitsToStringBits(masterKey));
+        String Kn = permutation(TablePermutation.PC1, masterKey);
         
         // Séparation de la clé en deux
         String Gauche = Kn.substring(0,28);
         String Droite = Kn.substring(28, 56);
 
         // On décalle vers la gauche  
-        Gauche = bitsToStringBits(decalleGauche(stringBitsToBits(Gauche), décallage)); 
-        Droite = bitsToStringBits(decalleGauche(stringBitsToBits(Droite), décallage));  
+        Gauche = decalleGauche(Gauche, décallage); 
+        Droite = decalleGauche(Droite, décallage);  
 
         // On recolle les blocs
         Kn = Gauche + Droite;
@@ -262,29 +223,23 @@ public class Des {
         Kn = permutation(TablePermutation.PC2, Kn);
 
         // Ajout de la nouvelle clé à tab_cles
-        tab_cles.add(stringBitsToBits(Kn));
+        tab_cles.add(Kn);
     }
        
     /**
-     * Effectue un décallage vers la gauche de l'ensemble des entiers contenu dans bloc,
+     * Effectue un décallage vers la gauche de l'ensemble des caractères de bloc,
      * les derniers indice sont remplacés par des 0
      * 
-     * @param bloc tableau où l'on souhaite effectuer un décallage 
+     * @param bloc chaîne de caractère où l'on souhaite effectuer un décallage 
      * @param nbCran nombre de cran dont on souhaite décaller l'index
-     * @return Un nouveau tableau décallé
+     * @return Une nouvelle chaîne de charactère, décallé
      */
-    public int[] decalleGauche(int[] bloc, int nbCran){
-        int[] bloc_decalle = new int[bloc.length];
-
-        for (int i = 0; i < bloc.length; i++) {
-            if (i + nbCran < bloc.length){
-                bloc_decalle[i] = bloc[i + nbCran];
-            }
-            else {
-                bloc_decalle[i] = 0;
-            }
+    public String decalleGauche(String bloc, int nbCran){
+        String bloc_décallé = bloc.substring(nbCran, bloc.length());
+        for (int i = 0; i < nbCran; i++) {
+            bloc_décallé += "0";
         }
-        return bloc_decalle;
+        return bloc_décallé;
     }
 
     /**
@@ -297,7 +252,7 @@ public class Des {
     public String F(int numeroRonde, String Dn) {
         String Dn_prime = permutation(TablePermutation.E, Dn);
         
-        String Dn_etoile = XOR(Dn_prime, bitsToStringBits(tab_cles.get(numeroRonde)));
+        String Dn_etoile = XOR(Dn_prime, tab_cles.get(numeroRonde));
         
         ArrayList<String> blocs = découpageEnSousBloc(Dn_etoile, 6);
         
@@ -320,14 +275,14 @@ public class Des {
             throw new IllegalArgumentException("les deux chaînes binaires doivent être de même longeur !");
         }
 
-        int[] chaîne_binaire_1_to_bits = stringBitsToBits(chaîne_binaire_1);
-        int[] chaîne_binaire_2_to_bits = stringBitsToBits(chaîne_binaire_2);
-        int[] result = new int[chaîne_binaire_1.length()];
-      
-        for (int i = 0; i < chaîne_binaire_1_to_bits.length ;i++) {
-            result[i] = chaîne_binaire_1_to_bits[i] ^ chaîne_binaire_2_to_bits[i]; 
+        String resultat = "";
+        for (int i = 0; i < chaîne_binaire_1.length(); i++) {
+            int bit_chaine_binaire_1 = Character.getNumericValue(chaîne_binaire_1.charAt(i));
+            int bit_chaine_binaire_2 = Character.getNumericValue(chaîne_binaire_2.charAt(i));
+
+            resultat += String.valueOf(bit_chaine_binaire_1 ^ bit_chaine_binaire_2);
         }
-        return bitsToStringBits(result);
+        return resultat;
     }
 
     /**

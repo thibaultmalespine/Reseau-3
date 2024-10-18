@@ -1,0 +1,20 @@
+Compte rendu projet réseau :
+
+AVANCEMENT
+
+    Le projet est fini, les algorithmes DES (16 rondes) et TRIPLE DES fonctionnent, ainsi que l'interface graphique qui permet de crypté / décrypté à l'aide du TRIPLE DES un fichier texte
+
+ARBORESCENCE DU PROJET
+
+CONVERSION TEXTE --> BINAIRE
+
+    Pour les conversions string --> binaire j'ai récupéré chaque bit du message à l'aide de String.getBytes, en utf8, donc selon les caractères on obtient 1,2,3 ou 4 bits.
+    Ensuite je converti chaque bit en ça représentation sous chaîne de caractères à l'aide de String.format. 1 bit = 1 chaîne de caractères de taille 8.
+    J'obtiens alors une nouvelle chaîne de caractères binaire.
+    Pour tester qu'une chaîne de caractères est bien binaire, j'ai crée une classe ChaineBinaire qui possède une méthode booléenne estBinaire.
+    
+TEST
+
+    L'ensemble de mes tests sont dans le dossier test.
+    J'ai utilisé JUnit 4 pour effectué ces tests.
+    J'ai crée une feuille de test pour chaque classe que je souhaitais tester, 

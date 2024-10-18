@@ -6,6 +6,30 @@ AVANCEMENT
 
 ARBORESCENCE DU PROJET
 
+├── javadoc
+├── lib
+│   ├── hamcrest-core-1.3.jar
+│   └── junit-4.13.2.jar
+├── src
+│   ├── Algo
+│   │   ├── Des.java
+│   │   └── TripleDes.java
+│   ├── App.java
+│   ├── Data
+│   │   ├── MasterKey.java
+│   │   ├── TablePermutation.java
+│   │   └── TableS.java
+│   ├── Interface
+│   │   └── Fenetre.java
+│   └── Utils
+│       └── ChaineBinaire.java
+├── test
+│   ├── ChaineBinaireTest.java
+│   ├── DesTest.java
+│   ├── MasterKeyTest.java
+│   └── TripleDesTest.java
+└── texte_a_chiffrer.txt
+
 CONVERSION TEXTE --> BINAIRE
 
     Pour les conversions string --> binaire j'ai récupéré chaque bit du message à l'aide de String.getBytes, en utf8, donc selon les caractères on obtient 1,2,3 ou 4 bits.

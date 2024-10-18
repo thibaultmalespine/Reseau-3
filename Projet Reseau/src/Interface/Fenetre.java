@@ -132,7 +132,7 @@ public class Fenetre extends JFrame {
                     try {
                         String texte="";
                         for (String ligne : Files.readAllLines(Paths.get(file_chooser.getSelectedFile().getAbsolutePath()))) {
-                            texte += ligne;
+                            texte += ligne+"\n";
                         }
                         String texte_crypter = triple_des.crypte(texte);
                         saveFile("clé_fichier_crypté.txt", getMasterKeys());

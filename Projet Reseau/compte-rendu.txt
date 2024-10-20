@@ -1,44 +1,96 @@
-Compte rendu projet réseau :
+Compte rendu projet réseau
 
 AVANCEMENT
-
-    Le projet est fini, les algorithmes DES (16 rondes) et TRIPLE DES fonctionnent, ainsi que l'interface graphique qui permet de crypté / décrypté à l'aide du TRIPLE DES un fichier texte
+    Le projet est terminé, les algorithmes DES (16 rondes) et Triple DES fonctionnent, ainsi que l'interface graphique qui permet de crypter / décrypter un fichier texte à l'aide du Triple DES 
 
 ARBORESCENCE DU PROJET
-
 ├── javadoc
 ├── lib
-│   ├── hamcrest-core-1.3.jar
-│   └── junit-4.13.2.jar
+│   ├── hamcrest-core-1.3.jar
+│   └── junit-4.13.2.jar
 ├── src
-│   ├── Algo
-│   │   ├── Des.java
-│   │   └── TripleDes.java
-│   ├── App.java
-│   ├── Data
-│   │   ├── MasterKey.java
-│   │   ├── TablePermutation.java
-│   │   └── TableS.java
-│   ├── Interface
-│   │   └── Fenetre.java
-│   └── Utils
-│       └── ChaineBinaire.java
+│   ├── Algo
+│   │   ├── Des.java
+│   │   └── TripleDes.java
+│   ├── App.java
+│   ├── Data
+│   │   ├── MasterKey.java
+│   │   ├── TablePermutation.java
+│   │   └── TableS.java
+│   ├── Interface
+│   │   └── Fenetre.java
+│   └── Utils
+│       └── ChaineBinaire.java
 ├── test
-│   ├── ChaineBinaireTest.java
-│   ├── DesTest.java
-│   ├── MasterKeyTest.java
-│   └── TripleDesTest.java
+│   ├── ChaineBinaireTest.java
+│   ├── DesTest.java
+│   ├── MasterKeyTest.java
+│   └── TripleDesTest.java
 └── texte_a_chiffrer.txt
 
+ORGANISATION DES CLASSES
+Le code des différentes classes se trouve dans le dossier src.
+La classe Des et TripleDes contiennent les algorithmes, la classe Fenetre contient l’interface graphique. La classe App permet de lancer l’interface graphique.
+J’ai créé une classe MasterKey  pour pouvoir passer en paramètre de ma classe DES une MasterKey. Cela permet de décoder un message crypté avec une MasterKey spécifique.
+Les classes TablePermutation et TableS servent à stocker respectivement les tables de permutations et les tables de substitutions.
+Enfin j’ai créé une classe ChaineBinaire pour pouvoir y stocker des méthodes sur les chaînes binaires, mais finalement cette classe ne me sert qu’à tester si une chaîne de charactère est bien binaire.
+
 CONVERSION TEXTE --> BINAIRE
+Pour les conversions string --> binaire j'ai récupéré chaque bit du message à l'aide de String.getBytes, en utf8, donc selon les caractères on obtient 1,2,3 ou 4 bits.
+Ensuite je converti chaque bit en ça représentation sous chaîne de caractères à l'aide de String.format. 1 bit = 1 chaîne de caractères de taille 8.
+J'obtiens alors une nouvelle chaîne de caractères binaire.
+Pour tester qu'une chaîne de caractères est bien binaire, j'ai créé une classe ChaineBinaire qui possède une méthode booléenne estBinaire.
 
-    Pour les conversions string --> binaire j'ai récupéré chaque bit du message à l'aide de String.getBytes, en utf8, donc selon les caractères on obtient 1,2,3 ou 4 bits.
-    Ensuite je converti chaque bit en ça représentation sous chaîne de caractères à l'aide de String.format. 1 bit = 1 chaîne de caractères de taille 8.
-    J'obtiens alors une nouvelle chaîne de caractères binaire.
-    Pour tester qu'une chaîne de caractères est bien binaire, j'ai crée une classe ChaineBinaire qui possède une méthode booléenne estBinaire.
-    
+CONVERSION BINAIRE --> TEXTE
+Pour  passer de la représentation binaire en texte, comme j’ai encoder en utf-8, je dois lire les premiers bits pour savoir sur combien d’octets est encoder le charactère. 
+J’appelle ensuite une sous fonction qui prend en entrée la représentation binaire du charactère et retourne le caractère utf-8 à l’aide de new String(byte[] octets, StandardCharsets.UTF_8)
+
 TEST
+L'ensemble de mes tests sont dans le dossier test.
+J'ai utilisé JUnit 4 pour effectuer ces tests.
+J'ai créé une feuille de test pour chaque classe que je souhaitais tester, les classes contenants seulement des données (TablePermutation et TableS) et la classe Fenetre n’ont pas de feuille de test.
+J’ai testé toutes les méthodes des autres classes, excepté les méthodes comme F et génèreClé qui font appelle à beaucoup de sous méthodes et dont le résultat et difficile à connaître à l’avance.
 
-    L'ensemble de mes tests sont dans le dossier test.
-    J'ai utilisé JUnit 4 pour effectué ces tests.
-    J'ai crée une feuille de test pour chaque classe que je souhaitais tester, 
+
+DES
+L’algorithme DES utilise globalement les mêmes méthodes  que celles décrites dans le sujet, à la différence près que j’utilise des String à la place de int[] pour les représentations binaires, et que les noms des méthodes diffères un peu. 
+
+DES 16 RONDES
+Pour l’algorithme DES avec 16 rondes, je stocke les Kn clés dans une variable de classe après les avoir générées à partir de la master key.
+Je parcours les clés à l’aide d’une boucle. 
+Pour les tables de permutations S, j’utilise l’indice de la boucle avec un modulo 8 pour obtenir la table correspondante au numéro de la ronde.
+
+TRIPLE DES
+L’algorithme Triple DES fonctionne comme suit :
+	Pour crypter :
+-	Crypte 1 fois avec une première master key
+-	Crypte 1 fois avec une deuxième master key
+-	Crypte 1 fois avec une troisième master key
+	Pour décrypter
+-	Décrypte 1 fois avec la troisième master key
+-	Décrypte 1 fois avec la deuxième master key
+-	Décrypte 1 fois avec la première master key
+    Pour se faire j’utilise 3 instances de DES dans Triple DES, que j’initialise avec une master key différente à chaque fois.
+Triple DES prends en paramètre une liste de 3 master keys.
+
+INTERFACE GRAPHIQUE 
+L’interface graphique permet de crypté un fichier texte ou de décrypter un fichier texte à l’aide des master keys utilisées pour le cryptage.
+J’ai fait le choix de fermer l’interface après un cryptage ou un décryptage afin de forcer l’utilisation du fichier contenant les master keys pour prouver que l’ensemble fonctionne.
+L’application s’ouvre sur deux boutons : crypter et décrypter
+	Fonctionnement du bouton "Crypter"
+-	Étape 1 : Sélectionner le fichier à crypter
+-	Étape 2 : Cryptage du fichier dans fichier_crypté.txt
+-	Étape 3 : Sauvegarde des clés dans clé_fichier_crypté.txt
+-	Étape 4 : Affichage du texte crypté puis fermeture de l’application
+
+	Fonctionnement du bouton "Décrypter"
+-	Etape 1 : Sélectionner le fichier contenant les clés de décryptage (clé_fichier_crypté.txt).
+-	Étape 2 : Sélectionner le fichier crypté à décrypter (fichier_crypté.txt).
+-	Étape 3 : Décryptage du fichier dans fichier_decrypté.txt.
+-	Étape 4 : Affichage du texte décrypté puis fermeture de l’application.
+
+Tous les fichiers sont enregistrés à la racine du projet. 
+L’explorateur de fichier s’ouvre également à la racine du projet.
+
+JAVADOC 
+La javadoc s’ouvre en copiant le chemin du fichier index.html dans un navigateur

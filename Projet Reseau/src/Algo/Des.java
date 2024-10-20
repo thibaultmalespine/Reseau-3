@@ -136,8 +136,8 @@ public class Des {
 
     /**
      * Décode un charactère encoder en utf-8
-     * @param chaîne_binaire 
-     * @return
+     * @param chaîne_binaire le charactère sous forme binaire
+     * @return le charactère en utf-8
      */
     public String décoderCharactère(String chaîne_binaire){
         byte[] octets = new byte[chaîne_binaire.length() / 8];
